@@ -250,56 +250,95 @@ python rag\evaluate_explanations.py `
 
 ### Metrics and Scoring
 
-The evaluation compares four explanation conditions:
-
-- `template`: a deterministic, feature-based explanation.
-- `retrieval_only`: retrieved reference text without a generative model.
-- `llm_only`: an Ollama explanation generated from detector context.
-- `llm_rag`: an Ollama explanation generated from detector context and retrieved references.
-
-The metrics below are automated proxies for explanation quality. They are not human-verified factual accuracy and should be used with the output caveat in `rag/evaluation_metrics.csv`.
+Average results across 10 evaluation samples. Metrics are automated proxies, not human-verified accuracy.
 
 #### RAG and retrieval metrics
 
-| Metric | Meaning |
-|---|---|
-| `retrieval_attack_type_match_rate` | Fraction of retrieved chunks whose source metadata matches the detected DDoS, Botnet, or Normal context. |
-| `retrieval_mean_similarity` | Mean cosine similarity between the retrieval query and retrieved chunks. |
-| `retrieval_source_coverage` | Number of distinct source names returned by retrieval. |
-| `retrieval_citation_count` | Number of source filenames cited in the explanation. |
-| `retrieval_citation_validity` | Fraction of cited filenames that are present in the retrieved source set. |
-| `seconds` (`generation_time` summary section) | End-to-end explanation or baseline generation time measured by the evaluation runner. |
-
-Retrieval metrics are reported for `llm_rag` and `retrieval_only`; they are `N/A` for `llm_only` and `template`.
+| Metric | llama3.2:3b | gemma2:2b | phi3:mini | Retrieval-only |
+|---|---:|---:|---:|---:|
+| Attack-type match rate | 1.000 | 1.000 | 1.000 | 1.000 |
+| Mean retrieval similarity | 0.561 | 0.561 | 0.561 | 0.561 |
+| Source coverage | 2.000 | 2.000 | 2.000 | 2.000 |
+| Citation count | 0.500 | 0.200 | 0.700 | 2.000 |
+| Citation validity | 1.000 | 1.000 | 0.833 | 1.000 |
+| Average generation time (seconds) | 3.557 | 5.600 | 30.849 | 0.048 |
 
 #### LLM and explanation metrics
 
-| Group | Metrics | Measurement |
-|---|---|---|
-| Relevance | `relevance_cosine`, `relevance_detected_class_named` | Cosine similarity between the explanation and detector context, plus whether the detected class is explicitly named. |
-| Accuracy | `accuracy_supported_share`, `accuracy_unsupported_share`, `accuracy_contradicted_share` | Per-sentence support classification against the knowledge chunks, using an NLI cross-encoder when available or embedding cosine similarity as a fallback. |
-| Technique accuracy | `accuracy_technique_ids`, `accuracy_technique_id_match_rate`, `accuracy_invalid_technique_ids` | Checks MITRE-style `Txxxx`/`Txxxx.xxx` IDs mentioned in explanations against the known technique set. |
-| Actionability | `actionability_concrete_action_count`, `actionability_step_count`, `actionability_action_step_share` | Counts concrete action steps and measures whether extracted steps start with an action verb. |
-| Required sections | `actionability_required_section_share` | Coverage of classification, observed evidence, and defensive action sections. |
-| Mitigations | `actionability_mitigation_vocabulary_matches` | Presence of recognized mitigation terms such as block, isolate, monitor, patch, filter, and mitigate. |
-| Consistency | `consistency_detected_class_named`, `consistency_other_class_diagnosis_absent`, `consistency_numeric_feature_values_match_share` | Checks class naming, avoids contradictory diagnoses, and compares numeric feature values with detector context. |
-| Clarity | `clarity_flesch_reading_ease`, `clarity_word_count`, `clarity_repeated_trigram_rate`, `clarity_format_compliant` | Readability, length, repeated text, and balanced Markdown formatting. |
+##### llama3.2:3b
 
-The NLI backend reports sentence support using a confidence threshold of `0.70`. If the NLI model is unavailable, the fallback marks a sentence as supported when its cosine similarity to the knowledge chunks is at least `0.55`.
+| Metric | LLM-only | LLM + RAG |
+|---|---:|---:|
+| Relevance cosine | 0.403 | 0.391 |
+| Detected class named | 0.000 | 0.400 |
+| Supported sentence share | 0.022 | 0.064 |
+| Unsupported sentence share | 0.694 | 0.757 |
+| Contradicted sentence share | 0.284 | 0.179 |
+| Sentence count | 24.0 | 18.8 |
+| Concrete action count | 1.100 | 1.700 |
+| Required-section share | 0.567 | 0.633 |
+| Consistency: class named | 0.000 | 0.400 |
+| Consistency: other diagnosis absent | 1.000 | 1.000 |
+| Flesch reading ease | 43.913 | 34.567 |
+| Word count | 352.6 | 238.1 |
+| Repeated-trigram rate | 0.151 | 0.096 |
+| Format compliant | 1.000 | 1.000 |
+| Quality relevance | 0.202 | 0.396 |
+| Quality accuracy | 0.017 | 0.050 |
+| Quality actionability | 0.408 | 0.496 |
+| Quality consistency | 0.667 | 0.800 |
+| Quality clarity | 0.763 | 0.750 |
+| Average generation time (seconds) | 4.811 | 3.557 |
 
-#### 0–1 quality scoring
+##### gemma2:2b
 
-The evaluator derives five quality scores from the detailed metrics. Values are clamped to the inclusive range `[0, 1]`; all scores are saved with a `quality_` prefix in the metrics CSV.
+| Metric | LLM-only | LLM + RAG |
+|---|---:|---:|
+| Relevance cosine | 0.350 | 0.401 |
+| Detected class named | 0.000 | 0.400 |
+| Supported sentence share | 0.015 | 0.064 |
+| Unsupported sentence share | 0.745 | 0.718 |
+| Contradicted sentence share | 0.241 | 0.217 |
+| Sentence count | 33.0 | 28.9 |
+| Concrete action count | 1.800 | 3.600 |
+| Required-section share | 0.567 | 0.800 |
+| Consistency: class named | 0.000 | 0.400 |
+| Consistency: other diagnosis absent | 1.000 | 1.000 |
+| Flesch reading ease | 39.731 | 33.534 |
+| Word count | 453.9 | 357.0 |
+| Repeated-trigram rate | 0.042 | 0.041 |
+| Format compliant | 1.000 | 1.000 |
+| Quality relevance | 0.175 | 0.400 |
+| Quality accuracy | 0.012 | 0.049 |
+| Quality actionability | 0.387 | 0.636 |
+| Quality consistency | 0.667 | 0.800 |
+| Quality clarity | 0.785 | 0.765 |
+| Average generation time (seconds) | 8.118 | 5.600 |
 
-- **Relevance:** `(clamped cosine similarity + detected-class-name match) / 2`.
-- **Accuracy:** `supported_share * (1 - contradicted_share)`, multiplied by the valid MITRE technique-ID match rate when technique IDs are present.
-- **Actionability:** mean of required-section share, action-step share, `concrete_action_count / 3`, and recognized mitigation-vocabulary count `/ 3`.
-- **Consistency:** mean of detected-class naming, absence of another diagnosis, and numeric feature-value match share. A missing numeric comparison is treated neutrally at `1.0` for this derived score.
-- **Clarity:** mean of clamped Flesch reading ease (`Flesch / 100`), Markdown format compliance, and `1 - repeated_trigram_rate`.
+##### phi3:mini
 
-There is no separate overall composite score: interpret the five dimension scores independently. For example, a low relevance score indicates weak alignment with detector context, while a low accuracy score indicates unsupported or contradicted statements.
-
-The summary script reports mean and standard deviation by condition and model, plus paired two-sided Wilcoxon tests for `llm_only` versus `llm_rag`. A p-value requires at least two paired observations; with fewer observations, the test is marked as not tested.
+| Metric | LLM-only | LLM + RAG |
+|---|---:|---:|
+| Relevance cosine | 0.298 | 0.316 |
+| Detected class named | 0.000 | 0.300 |
+| Supported sentence share | 0.013 | 0.059 |
+| Unsupported sentence share | 0.671 | 0.708 |
+| Contradicted sentence share | 0.316 | 0.233 |
+| Sentence count | 118.8 | 82.7 |
+| Concrete action count | 1.700 | 1.100 |
+| Required-section share | 0.567 | 0.633 |
+| Consistency: class named | 0.000 | 0.300 |
+| Consistency: other diagnosis absent | 0.900 | 1.000 |
+| Flesch reading ease | 49.153 | 25.436 |
+| Word count | 1658.3 | 1239.5 |
+| Repeated-trigram rate | 0.091 | 0.048 |
+| Format compliant | 0.900 | 0.800 |
+| Quality relevance | 0.149 | 0.308 |
+| Quality accuracy | 0.008 | 0.049 |
+| Quality actionability | 0.367 | 0.470 |
+| Quality consistency | 0.624 | 0.767 |
+| Quality clarity | 0.767 | 0.669 |
+| Average generation time (seconds) | 40.517 | 30.849 |
 
 ## Model Details
 
