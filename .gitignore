@@ -1,0 +1,45 @@
+
+# Python environments and generated caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.template
+.streamlit/secrets.toml
+
+# Local datasets and generated prediction output
+data/raw/
+data/processed/*.npy
+/random_cnn_lstm_predictions.csv
+
+# Generated RAG index and evaluation output
+rag/rag_store/*.index
+rag/rag_store/chunks.json
+rag/evaluation_*.csv
+rag/*_charts/
+
+# Processed datasets
+data/processed/*.npy
+
+# Logs, editor backups, and OS files
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+Desktop.ini

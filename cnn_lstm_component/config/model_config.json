@@ -1,0 +1,14 @@
+{
+  "n_features": 38,
+  "n_classes": 3,
+  "sequence_length": 10,
+  "class_names": ["Normal", "DDoS", "Botnet"],
+  "class_ids": {"Normal": 0, "DDoS": 1, "Botnet": 2},
+  "cnn_filters": [64, 128],
+  "kernel_size": 3,
+  "lstm_units": [128, 64],
+  "dropout": 0.3,
+  "fc_units": 64,
+  "scaler": "preprocessing/scaler.pkl",
+  "checkpoint": "models/best_model.pth"
+}

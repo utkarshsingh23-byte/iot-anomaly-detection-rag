@@ -1,0 +1,31 @@
+Title: Cyber Swachhta Kendra: IOT Botnets Targeting Vulnerable IP Cameras
+Source: https://www.csk.gov.in/alerts/IOT_Botnets_Targeting_Vulnerable_IP_cameras.html
+
+IOT Botnets Targeting Vulnerable IP Cameras
+Original Issue Date:-
+June 19, 2017
+Virus Type:-
+Worm/Backdoor
+Severity:-
+High
+Several malicious internet worms, targeting embedded/Internet of Things (âIoTâ)  IP cameras of various OEMâs spreads by scanning the public internet for devices running with insecure default credentials/ inherent security weaknesses is reported.
+A remote attacker can completely control the vulnerable device, can remotely control the camera operations, can view the video feeds, upload and download files from attacker controlled remote servers. Additionally these compromised devices can also be used for activities such as DDoS or other malicious activities leading to full loss of confidentiality, integrity and availability, depending on the actions of the attacker.
+These successors of IOT Mirai botnets [dubbed
+Persirai, TheMoon, DvrHelper, TheMoon, Hajime
+] leverage default-insecure user credentials, hidden functionalities, missing authorizations, command injection vulnerabilities, UPnP protocol, in the device firmware to own the devices and further spreading.
+Recommendations
+Review IOT devices [home Internet routers, DVRs, IP cameras]   to ensure they support the latest security protocols and standards and disable older insecure protocols. (check the vendors websites for updates & patches).
+Run updates and contact manufacturers to confirm devices are patched with the latest software and firmware.
+Change the default OEM credentials and ensure that passwords meet the minimum complexity.
+Disable Universal Plug and Play (UPnP) unless absolutely necessary.
+Implement account lockout policies to reduce the risk of brute forcing attacks.
+Telnet and SSH should be disabled on device if there is no requirement of remote management.
+Configure VPN and SSH to access device if remote access is required.
+Configure certificate based authentication for telnet client for remote management of devices.
+Implement Egress and Ingress filtering at router level.
+Unnecessary port and services should be stopped and closed.
+Logging must be enabled on the device to log all the activities.
+Enable and monitor perimeter device logs to detect scan attempts towards critical devices/systems.
+References
+http://blog.trendmicro.com/trendlabs-security-intelligence/persirai-new-internet-things-iot-botnet-targets-ip-cameras/
+https://www.dhs.gov/sites/default/files/publications/Strategic_Principles_for_Securing_the_Internet_of_Things-2016-1115-FINAL....pdf

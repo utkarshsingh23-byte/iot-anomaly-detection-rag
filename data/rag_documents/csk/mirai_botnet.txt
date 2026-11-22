@@ -1,0 +1,87 @@
+Title: Cyber Swachhta Kendra: Mirai Botnet affecting IoT devices
+Source: https://www.csk.gov.in/alerts/mirai.html
+
+Mirai Botnet affecting IoT devices
+Original Issue Date:-
+October 25, 2016
+Updated on:-
+December 7, 2017
+Virus Type:-
+Trojan/Backdoor
+Severity:-
+High
+It has been observed that the variants of a new malware named as
+"Mirai"
+targeting Internet of Things(IoT) devices such as printers, video camera, routers, smart TVs are spreading. The malware is capable of scanning the network devices or Internet of Things and try to compromise these systems especially those protected with defaults credentials or hardcoded username passwords.
+The malware is capable of performing the following function:
+Compromise IoT systems with default username and passwords
+Create botnets of the compromised devices.
+Use compromise devices to launch DDoS attacks.
+Make network connections to receive commands from launch further attacks.
+It is also reported that the malware resides in memory of the infected device and can be wiped out by simply rebooting of the compromised device. However, the malware scans the vulnerable devices constantly leading to the re-infection of the rebooted device within minutes of reboot.
+It is also reported that the malware resides in memory of the infected device and can be wiped out by simply rebooting of the compromised device. However, the malware scans the vulnerable devices constantly leading to the re-infection of the rebooted device within minutes of reboot.
+âSatoriâ a new variant of Mirai IoT DDoS malware
+It has been reported that âSatoriâ a new variant of Mirai IoT DDoS malware, is spreading like a worm recently. Satori, the new variant of Mirai is different from all previous variants as it does not use a Telnet port scanner instead it will scan TCP ports 37215 and 52869 on random IP addresses. It is employed with two new exploits which is targeting TCP ports 37215 and 52869. One of the exploit works on TCP port 52869 of IoT devices/routers, exploiting the vulnerability
+[CVE-2014-8361]
+in miniigd SOAP service in Realtek SDK.
+There are 3 C2s servers observed in Satori samples:
+95. 211. 123. 69:7645
+network. bigbotpein. com:23
+control. almashosting. ru
+Mirai Malware Package:
+The Mirai malware source code has been publically released which is written in C language. The main components of the malware are:
+Call-home routine:  This module is responsible for making network connections to command and control server. This module is executed initially on the compromised IoT device which then connects to the command and control server to receive attack information.
+Set of attack routines: These routines generates network traffic to choke victim's network capacity.
+Network Scanner routine: Scans the victims network to discover other vulnerable IoT devices across the network and report the list of such devices for further compromise and launching attacks.
+Command and Control Tool:
+The malware makes a use of command and control tool named as "cnc" written in "Go", which provides cross platform support including seven different computer architecture for both 32 and 64-bit intel chips, AMD and MIPS chips for common home IoT devices. The malware is designed to run on regular computers as well as on hardware devices.
+Mirai's malware default username/password list used for scanning vulnerable IoT devices is shown below:
+Indicators of compromise:
+Abnormal traffic on port  2323/TCP and 23/TCP as it scans for vulnerable devices.
+Command and Control Network traffic on port 48101/TCP.
+Huge outbound traffic if the device is part of DDoS attack.
+Indicators of compromise for âSatoriâ:
+Abnormal traffic on port 37215/TCP and 52869/TCP as it scans for vulnerable devices
+Command and control network traffic to these IP addresses and domains: "95. 211. 123. 69:7645", "network. bigbotpein. com:23", "control. almashosting. ru"
+Huge outbound traffic if the device is part of DDoS attack
+For detailed IoCs, please visit
+â360 netlab reportâ
+Countermeasures for securing IOT devices:
+Restrict Web Management Interface  access of IoT devices to authorized users only and change default username/passwords
+Always change Default login credentials before deployment in production.
+Change default credentials at device startup and ensure that passwords meet the minimum complexity.
+Disable Universal Plug and Play (UPnP) on IoT devices unless absolutely required.
+Users should be aware of the installed devices and their capabilities. If a device comes with a default password or an open Wi-Fi connection, users should change the password and only allow it to operate on a home network with a secured Wi-Fi router.
+Control access to the devices with Access List
+Configure devices to "lock" or log out and require a user to re-authenticate if left unattended
+Identify systems with default passwords and implement abovementioned measures. Some the systems that need to examined are Routers, switches, web applications and administrative web interfaces, ICS systems, Telnet and SSH interfaces
+Implement account lockout policies to reduce the risk of brute forcing attacks.
+Telnet and SSH should be disabled on device if there is no requirement of remote management
+Configure VPN and SSH to access device if remote access is required.
+Configure certificate based authentication for telnet client for remote management of devices
+Implement Egress and Ingress filtering at router level.
+Report suspicious entries in Routers to your Internet Service Provider
+Keep up to date Antivirus on the computer system
+Keep up-to-date on patches and fixes on the IoT devices, operating system and applications.
+Unnecessary port and services should be stopped and closed.
+Logging must be enabled on the device to log all the activities.
+Enable and monitor perimeter device logs to detect scan attempts towards critical devices/systems.
+Countermeasure for preventing DDoS attacks:
+Identify critical services and their priority. Develop Business Continuity Plan.
+Deploy appropriate Intrusion/DDoS Prevention System capable of detecting and mitigating DDoS attacks.
+Ensure that Intrusion/DDoS Prevention System contain signatures to detect the attacks launched from common DDoS tools.
+Maintain list of contacts of ISPs, vendors of network and security devices and contact them as appropriate
+Understand your current environment, and have a baseline of the daily volume, type, and performance of network traffic.
+Review the traffic patterns and logs of perimeter devices to detect anomalies in traffic, network level floods (TCP,UDP, SYN, etc) and application floods (HTTP GET)
+Maintain and regularly examine logs of webservers to detect malformed requests/traffic.
+In case your SLA with ISP includes DDoS mitigation services instruct your staff about the requirements to be sent to ISP.
+References:
+https://www.us-cert.gov/ncas/alerts/TA16-288A
+https://krebsonsecurity.com/2016/09/krebsonsecurity-hit-with-record-ddos/
+https://nakedsecurity.sophos.com/2016/10/05/mirai-internet-of-things-malware-from-krebs-ddos-attack-goes-open-source/
+https://www.pcworld.com/article/3126362/security/iot-malware-behind-record-ddos-attack-is-now-available-to-all-hackers.html
+http://arstechnica.com/security/2016/09/botnet-of-145k-cameras-reportedly-deliver-internets-biggest-ddos-ever/
+http://www.darkreading.com/denial-of-service-attacks/iot-ddos-attack-code-released-/d/d-id/1327086
+https://ics-cert.us-cert.gov/alerts/ICS-ALERT-16-286-01
+http://blog.netlab.360.com/warning-satori-a-new-mirai-variant-is-spreading-in-worm-style-on-port-37215-and-52869-en/
+https://www.bleepingcomputer.com/news/security/satori-botnet-has-sudden-awakening-with-over-280-000-active-bots/
