@@ -246,6 +246,61 @@ python rag\evaluate_explanations.py `
   --output rag\evaluation_metrics.csv
 ```
 
+## Results
+
+### Metrics and Scoring
+
+The evaluation compares four explanation conditions:
+
+- `template`: a deterministic, feature-based explanation.
+- `retrieval_only`: retrieved reference text without a generative model.
+- `llm_only`: an Ollama explanation generated from detector context.
+- `llm_rag`: an Ollama explanation generated from detector context and retrieved references.
+
+The metrics below are automated proxies for explanation quality. They are not human-verified factual accuracy and should be used with the output caveat in `rag/evaluation_metrics.csv`.
+
+#### RAG and retrieval metrics
+
+| Metric | Meaning |
+|---|---|
+| `retrieval_attack_type_match_rate` | Fraction of retrieved chunks whose source metadata matches the detected DDoS, Botnet, or Normal context. |
+| `retrieval_mean_similarity` | Mean cosine similarity between the retrieval query and retrieved chunks. |
+| `retrieval_source_coverage` | Number of distinct source names returned by retrieval. |
+| `retrieval_citation_count` | Number of source filenames cited in the explanation. |
+| `retrieval_citation_validity` | Fraction of cited filenames that are present in the retrieved source set. |
+| `seconds` (`generation_time` summary section) | End-to-end explanation or baseline generation time measured by the evaluation runner. |
+
+Retrieval metrics are reported for `llm_rag` and `retrieval_only`; they are `N/A` for `llm_only` and `template`.
+
+#### LLM and explanation metrics
+
+| Group | Metrics | Measurement |
+|---|---|---|
+| Relevance | `relevance_cosine`, `relevance_detected_class_named` | Cosine similarity between the explanation and detector context, plus whether the detected class is explicitly named. |
+| Accuracy | `accuracy_supported_share`, `accuracy_unsupported_share`, `accuracy_contradicted_share` | Per-sentence support classification against the knowledge chunks, using an NLI cross-encoder when available or embedding cosine similarity as a fallback. |
+| Technique accuracy | `accuracy_technique_ids`, `accuracy_technique_id_match_rate`, `accuracy_invalid_technique_ids` | Checks MITRE-style `Txxxx`/`Txxxx.xxx` IDs mentioned in explanations against the known technique set. |
+| Actionability | `actionability_concrete_action_count`, `actionability_step_count`, `actionability_action_step_share` | Counts concrete action steps and measures whether extracted steps start with an action verb. |
+| Required sections | `actionability_required_section_share` | Coverage of classification, observed evidence, and defensive action sections. |
+| Mitigations | `actionability_mitigation_vocabulary_matches` | Presence of recognized mitigation terms such as block, isolate, monitor, patch, filter, and mitigate. |
+| Consistency | `consistency_detected_class_named`, `consistency_other_class_diagnosis_absent`, `consistency_numeric_feature_values_match_share` | Checks class naming, avoids contradictory diagnoses, and compares numeric feature values with detector context. |
+| Clarity | `clarity_flesch_reading_ease`, `clarity_word_count`, `clarity_repeated_trigram_rate`, `clarity_format_compliant` | Readability, length, repeated text, and balanced Markdown formatting. |
+
+The NLI backend reports sentence support using a confidence threshold of `0.70`. If the NLI model is unavailable, the fallback marks a sentence as supported when its cosine similarity to the knowledge chunks is at least `0.55`.
+
+#### 0–1 quality scoring
+
+The evaluator derives five quality scores from the detailed metrics. Values are clamped to the inclusive range `[0, 1]`; all scores are saved with a `quality_` prefix in the metrics CSV.
+
+- **Relevance:** `(clamped cosine similarity + detected-class-name match) / 2`.
+- **Accuracy:** `supported_share * (1 - contradicted_share)`, multiplied by the valid MITRE technique-ID match rate when technique IDs are present.
+- **Actionability:** mean of required-section share, action-step share, `concrete_action_count / 3`, and recognized mitigation-vocabulary count `/ 3`.
+- **Consistency:** mean of detected-class naming, absence of another diagnosis, and numeric feature-value match share. A missing numeric comparison is treated neutrally at `1.0` for this derived score.
+- **Clarity:** mean of clamped Flesch reading ease (`Flesch / 100`), Markdown format compliance, and `1 - repeated_trigram_rate`.
+
+There is no separate overall composite score: interpret the five dimension scores independently. For example, a low relevance score indicates weak alignment with detector context, while a low accuracy score indicates unsupported or contradicted statements.
+
+The summary script reports mean and standard deviation by condition and model, plus paired two-sided Wilcoxon tests for `llm_only` versus `llm_rag`. A p-value requires at least two paired observations; with fewer observations, the test is marked as not tested.
+
 ## Model Details
 
 - Input shape: `(batch_size, 10, 38)`
